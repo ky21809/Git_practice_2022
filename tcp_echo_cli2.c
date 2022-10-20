@@ -55,7 +55,7 @@ void client(int s, struct sockaddr *peer, socklen_t plen){
 * pid > 0: 親プロセス、受信関数receiverを呼び出す。
 */
     int pid;
-    
+
     pid = fork();
     if (pid < 0)
         error(1,errno,"fork");
