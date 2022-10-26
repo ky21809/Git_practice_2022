@@ -5,6 +5,7 @@
 struct sockaddr_in *
 set_address4 (char *hname, char *iname, char *sname,
               struct sockaddr_in *sap, char *protocol)
+
 {
     struct servent *sp;
     struct hostent *hp;
@@ -67,6 +68,6 @@ set_address4 (char *hname, char *iname, char *sname,
         	}
         	sap->sin_port = sp->s_port;
     	}
-	}
+    }
     return sap;
 }
