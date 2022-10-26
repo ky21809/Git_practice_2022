@@ -3,22 +3,21 @@
 #include "einet.h"
 
 struct sockaddr_in *
-set_address4 {char *hname, char *iname, char *sname,
-              struct sockaddr_in *sap, char *protocol}
+set_address4 (char *hname, char *iname, char *sname,
+              struct sockaddr_in *sap, char *protocol)
 {
     struct servent *sp;
     struct hostent *hp;
     char           *endptr;
     short          port;
 
-    bzero{sap, sizeof(*sap)}; // 必ず、全体を0でクリアする。
+    bzero(sap, sizeof(*sap)); // 必ず、全体を0でクリアする。
     sap->sin_family = AF_INET; // アドレスファミリー(sin_family)にAF_INET(IPv4)を設定する。
-    #ifndef CYGWIN
-        sap->sin_len = sizeof(*sap); // サイズ(sin_len)に構造体のサイズを設定する。
-    #endif
+#ifndef CYGWIN
+    sap->sin_len = sizeof(*sap); // サイズ(sin_len)に構造体のサイズを設定する。
+#endif
 
-    if{hname == NULL}
-        sap->sin_addr.s_addr = htonl(INADDR_ANY);
+    if(hname == NULL) sap->sin_addr.s_addr = htonl(INADDR_ANY);
     /*
     *<host>の省略時、hnameはNULLが設定されている。
     *sap->sin_addrにhtonl(INADDR_ANY)を設定する。
@@ -54,16 +53,20 @@ set_address4 {char *hname, char *iname, char *sname,
     *strtol()でポート番号に変換し、sap->sin_portにhtons(port)を設定する。
     */
     else{
-        sp = getservbyname(sname, protocol);
-        /*
-        *-p <port>にサービス名を指定した時、snameには、サービス名の文字列が設定されている。
-        *getservbyname()でポート番号に変換し、sap->sin_portにsp->s_portを設定する。
-        */
-        if(sp == NULL){
-            error(0, 0, "unknown service: %s", sname);
-            return NULL;
-        }
-        sap->sin_port = sp->s_port;
-    }
+		port = strtol(sname, &endptr, 0);
+		if (*endptr == 0) sap->sin_port = htons(port);
+		else{
+        	sp = getservbyname(sname, protocol);
+        	/*
+        	*-p <port>にサービス名を指定した時、snameには、サービス名の文字列が設定されている。
+        	*getservbyname()でポート番号に変換し、sap->sin_portにsp->s_portを設定する。
+        	*/
+        	if(sp == NULL){
+            	error(0, 0, "unknown service: %s", sname);
+            	return NULL;
+        	}
+        	sap->sin_port = sp->s_port;
+    	}
+	}
     return sap;
 }
