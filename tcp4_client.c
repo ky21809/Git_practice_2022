@@ -37,7 +37,7 @@ int main (int argc, char **argv,char **envp){
 
     if((getpid() == pid) && (silent == 0)){
         print_local_name(s);
-        print_peer_name((strucgt sockaddr * ) &peer);
+        print_peer_name((struct sockaddr * ) &peer);
     }
 
     if(close(s) < 0)

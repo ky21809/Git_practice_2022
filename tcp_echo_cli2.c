@@ -13,10 +13,10 @@ void sender(int s){
             *ptr++ = pat;
 
     for(count = num_echo; count-- > 0;){ /*送信のループ*/
-        slen = send(s,send_buf,(PAT_END = PAT_BEGIN + 1) * num_rep, 0);
+        slen = send(s,send_buf,(PAT_END - PAT_BEGIN + 1) * num_rep, 0);
         if (slen >= 0){ /*送信*/
             total += slen;
-            if (varbose)
+            if (verbose)
                 printfnl("send: %6d", slen); /*送信データ数表示*/
         }
         else
@@ -25,6 +25,7 @@ void sender(int s){
         printfnl("send total: %6d", total);
     if(shutdown(s, SHUT_WR) < 0)  /*コネクション切断*/
         error(1, errno, "shutdown call failed"); /*エラー表示*/
+    }
 }
 
 void receiver (int s){
