@@ -29,18 +29,20 @@ set_address4 (char *hname, char *iname, char *sname,
         /*
         *<host>にリテラル（数値）を指定したとき、hnameは、リテラル（数値）の文字列が設定されている。
         *inet_pton関数でIPv4アドレスに変換し、sap->sin_addrに直接設定する。
-        *inet_ptonの戻り値で、1なら変換成功。0なら変換不成功。
+        *戻り値が0なら、リテラル表現ではないことを意味している。
         */
             hp = gethostbyname2(hname, AF_INET);
             /*
             *<host>にホスト名を指定した時、hnameは、ホスト名の文字列が設定されている。
             *gethostbyname2関数でIPv4アドレスに変換し、sap->sin_addrにhp->h_addrを設定する。
+	    *戻り値は10行目のstruct hostent構造体へのポインタである。
+	    *NULLの時はエラーで、ホスト名を解決できなかったことを意味している。
             */
             if(hp == NULL){
             /*
-            *-p <port>の省略時、snameがNULLに設定されている。
+            *-p <port>の省略時、snameはNULLが設定されている。
             *sap->sin_portにhtons(PORT_NO)を設定する。
-            *PORT_NOは(9Y00(5年生 Y=5)+出席番号)に設定されている。
+            *PORT_NOは(9700+出席番号)に設定されている。
             */
                 error(0, 0, "unknown IPv4 host: %s", hname);
                 return NULL;
@@ -49,12 +51,13 @@ set_address4 (char *hname, char *iname, char *sname,
         }
     }
     if(sname == NULL) sap->sin_port = htons(port);
-    /*
-    *-p <port>にリテラル（数値）を指定したとき、snameは、リテラル（数値）の文字列が設定されている。
-    *strtol()でポート番号に変換し、sap->sin_portにhtons(port)を設定する。
-    */
     else{
 		port = strtol(sname, &endptr, 0);
+    	/*
+    	*-p <port>にリテラル（数値）を指定したとき、snameは、リテラル（数値）の文字列が設定されている。
+    	*strtol()でポート番号に変換し、sap->sin_portにhtons(port)を設定する。
+    	**endptr == 0は文字列の最後まで読んだという意味である。
+		*/
 		if (*endptr == 0) sap->sin_port = htons(port);
 		else{
         	sp = getservbyname(sname, protocol);
@@ -65,7 +68,7 @@ set_address4 (char *hname, char *iname, char *sname,
         	if(sp == NULL){
             	error(0, 0, "unknown service: %s", sname);
             	return NULL;
-        	}
+			}
         	sap->sin_port = sp->s_port;
     	}
     }
