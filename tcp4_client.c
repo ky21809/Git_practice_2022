@@ -13,10 +13,21 @@ int main (int argc, char **argv,char **envp){
     argn = parse_options(argc,argv);
 
     s = socket(PF_INET, SOCK_STREAM, 0);
+    /*
+     * ソケットを生成する。
+     * ネットワークシステムは「IPv4」を指定する。
+     * 通信タイプは「ストリーム(TCP)」を指定する。
+     * プロトコルの指定は「0(自動設定)」を指定する。
+     */
     if (s<0) 
         error(1, errno, "socket call failed");
     
     if (set_address4(argv[argn],iname,sname,&peer,"tcp") == NULL)
+    /*
+     * ソケットアドレス構造体変数(peer)に以下の値(相手)を設定する(set_address4)。
+     * IPアドレス(argv[argn])。
+     * ポート番号(sname)。
+     */
         error(1, errno, "set address failed");
 
     if (connect(s,(struct sockaddr*)&peer,sizeof(peer)) < 0)
