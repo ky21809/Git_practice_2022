@@ -51,11 +51,7 @@ int main (int argc, char **argv,char **envp){
         print_peer_name((struct sockaddr * ) &peer);
     }
 
-    if(close(s) < 0)
-    /*
-    * ソケットを閉じる(close)。
-    * s:ソケットディスクリプタ。
-    */
+    if(close(s) < 0)// ソケットを閉じる(close)。
         error(1, errno, "close call failed");
     exit(0);
 }
