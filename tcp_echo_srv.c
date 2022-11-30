@@ -3,7 +3,7 @@
 #include "einet.h"
 
 void server(int s, struct sockaddr *peer,socklen_t plen){
-    static char recv_buf[RECV_BUF_SIZE;
+    static char recv_buf[RECV_BUF_SIZE];
 
     int slen, rlen, total = 0;
 
