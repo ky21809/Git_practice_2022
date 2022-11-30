@@ -10,10 +10,11 @@ void sender(int s){
     ptr = send_buf; /*送信パターン作成 */
     for(count = num_rep; count-- > 0;)
         for(pat = PAT_BEGIN; pat <= PAT_END; pat++)
-            *ptr++ = pat;
+            *ptr++ = pat; /* バッファに送信パターン（文字）を生成する。*/
 
     for(count = num_echo; count-- > 0;){ /*送信のループ*/
         slen = send(s,send_buf,(PAT_END - PAT_BEGIN + 1) * num_rep, 0);
+        /* サーバに送信パターンを送信する。*/
         if (slen >= 0){ /*送信*/
             total += slen;
             if (verbose)
@@ -23,7 +24,11 @@ void sender(int s){
             error(1, errno, "send failed");
     if(silent == 0)
         printfnl("send total: %6d", total);
-    if(shutdown(s, SHUT_WR) < 0)  /*コネクション切断*/
+    if(shutdown(s, SHUT_WR) < 0)  
+    /*
+     * コネクションを切断する。
+     * 「先に切断するホスト」に対応する。
+     */
         error(1, errno, "shutdown call failed"); /*エラー表示*/
     }
 }
@@ -32,8 +37,15 @@ void receiver (int s){
     static char recv_buf[RECV_BUF_SIZE];
     int         count, rlen, total = 0;
 
-    while(1){ /*受信のループ*/
-        rlen = recv(s, recv_buf, sizeof(recv_buf), 0); /*受信*/
+    while(1){ /*受信のループで無限ループする。*/
+        rlen = recv(s, recv_buf, sizeof(recv_buf), 0);
+        /*
+         * サーバからのエコーバックを受信する。
+         * recv関数の戻り地 rlenの値によって動作を変える。
+         * rlen == 0: 送信側からコネクションを切断された。受信を終了する。
+         * rlen > 0: 受信バッファ(recv_buf)の内容を表示する。
+         * rlen < 0: エラーを表示する。
+         */
         if (rlen == 0)
             break; /*サーバから切断された*/
         else if (rlen > 0){
@@ -51,7 +63,7 @@ void receiver (int s){
 void client(int s, struct sockaddr *peer, socklen_t plen){
 /*
 * fork関数の戻り値pidの値によって動作を変える。
-* pid < 0:エラー
+* pid < 0: エラー
 * pid == 0: 子プロセス、送信関数senderを呼び出す。
 * pid > 0: 親プロセス、受信関数receiverを呼び出す。
 */
