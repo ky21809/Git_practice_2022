@@ -50,7 +50,7 @@ set_address4 (char *hname, char *iname, char *sname,
             memcpy((char *)&sap->sin_addr,(char *)hp->h_addr, hp->h_length);
         }
     }
-    if(sname == NULL) sap->sin_port = htons(port);
+    if(sname == NULL) sap->sin_port = htons(PORT_NO);
     else{
 		port = strtol(sname, &endptr, 0);
     	/*
